@@ -45,7 +45,7 @@ If you do not use CMake, you still can build the project, you merely need to
 compile the `*.cpp` files in the PjonHL directory and link against them. When
 compiling you need to have the Pjon source directory as an include path.
 
-## Simplified Concept
+## Concept
 PjonHL consists of two main classes:
 
 ### Bus:
@@ -128,7 +128,7 @@ if(receivedPacket.isValid())
 }
 ```
 
-## Simplified Class relationship:
+## Class relationship:
 ```
 ----------------------      ---------------------------------------------------
 | Connection         |      | Bus                                             |
