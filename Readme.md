@@ -8,7 +8,7 @@ _PJON gateways_ or _Graphical User Interfaces_ for example on RapsberryPi.
 
 The target platforms for PjonHL are systems which provide
 - Threading
-- No constrained ressources (Memory)
+- No constrained resources (Memory)
 
 This document intends to give a simplified overview. For detailed documentation
 please have a look into the corresponding `.hpp` header files. A good start is
