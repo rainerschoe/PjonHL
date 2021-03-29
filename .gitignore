@@ -1,0 +1,7 @@
+build*
+*.swp
+*.stl
+compile_commands.json
+.cache
+*.out
+
