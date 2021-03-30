@@ -85,7 +85,7 @@ struct Address
     uint8_t id = 0;
 
     /// The busId
-    std::array<uint8_t,4> busId = {0,0,0};
+    std::array<uint8_t,4> busId = {0,0,0,0};
 
     /// Port
     uint16_t port = PJON_BROADCAST;
