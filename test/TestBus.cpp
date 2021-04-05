@@ -179,6 +179,19 @@ class PJON
         return shadow().send(info, payload, length);
     };
 
+    void set_acknowledge(bool)
+    {
+    }
+    void set_crc_32(bool)
+    {
+    }
+    void set_communication_mode(bool)
+    {
+    }
+    void set_shared_network(bool)
+    {
+    }
+
     PJON_Error _error;
     PJON_Receiver _receiver;
     Strategy strategy;

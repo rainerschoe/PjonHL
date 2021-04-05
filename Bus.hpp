@@ -29,6 +29,7 @@
 #include "Expect.hpp"
 #include "Address.hpp"
 #include "Connection.hpp"
+#include "BusConfig.hpp"
 
 template<class Strategy>
 class PJON;
@@ -37,6 +38,7 @@ namespace PjonHL
 {
 template<class Strategy>
 class Connection;
+
 
 template<class Strategy>
 class Bus
@@ -50,7 +52,14 @@ class Bus
         ///         It will also be used to filter incoming packets.
         /// @param f_strategy the underlying physical bus strategy to use.
         ///         e.g. an instance of ThroughSerial
-        Bus(Address f_localAddress, Strategy f_strategy);
+        /// @param f_config optional bus configuration, used to set up the bus.
+        //          see BusConfig struct for default config values used, as
+        //          well as additional details.
+        Bus(
+                Address f_localAddress,
+                Strategy f_strategy,
+                BusConfig f_config = BusConfig{}
+           );
 
         /// Handle which will be returned by createConnection() calls.
         /// Holds ownership of a connection and can be used to send/receive packets.

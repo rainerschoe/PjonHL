@@ -61,11 +61,17 @@ Bus<Strategy>::~Bus()
 }
 
 template<class Strategy>
-Bus<Strategy>::Bus(Address f_localAddress, Strategy f_strategy) :
+Bus<Strategy>::Bus(Address f_localAddress, Strategy f_strategy, BusConfig f_config) :
     m_pjon(f_localAddress.busId.data(), f_localAddress.id)
 {
     m_localAddress = f_localAddress;
     m_pjon.strategy = f_strategy;
+
+    // load config:
+    m_pjon.set_acknowledge(f_config.ackType == BusConfig::AckType::AckEnabled);
+    m_pjon.set_crc_32(f_config.crcType == BusConfig::CrcType::Crc32);
+    m_pjon.set_communication_mode(f_config.communicationMode == BusConfig::CommunicationMode::HalfDuplex);
+    m_pjon.set_shared_network(f_config.busTopology == BusConfig::BusTopology::Shared);
 
     // TODO: Currently PJON does not provide any interface to set a "callable" object
     //       Or a member function as error / receiver function.
