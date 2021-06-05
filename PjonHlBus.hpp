@@ -137,7 +137,7 @@ class Bus
 
         void dispatchTxRequest(TxRequest & f_request);
 
-        std::mutex m_txQueueMutex;
+        std::recursive_mutex m_txQueueMutex;
         std::queue< TxRequest > m_txQueue;
 
         Address m_localAddress;

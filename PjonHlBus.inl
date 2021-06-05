@@ -14,6 +14,7 @@
 
 #include <functional>
 #include <inttypes.h>
+#include <mutex>
 
 #include "PJONDefines.h"
 
@@ -162,7 +163,7 @@ std::future<bool> Bus<Strategy>::send(Address f_localAddress, Address f_remoteAd
     request.m_retransmitEnabled = f_enableRetransmit;
 
     auto future = request.m_successPromise.get_future();
-    std::lock_guard<std::mutex> guard(m_txQueueMutex);
+    std::lock_guard<std::recursive_mutex> guard(m_txQueueMutex);
     m_txQueue.push(std::move(request));
 
     return future;
@@ -248,10 +249,9 @@ void Bus<Strategy>::pjonEventLoop()
             {
                 // have a new packet to transmit and all previous packets are sent
                 // or failed
-                // FIXME: dispatch might call error handler.
-                //        this will then lead to recursive mutex lock
-                //        we should unlock mutex before dispatching
-                //        to pjon
+                // NOTE:  dispatch might call error handler.
+                //        this will then lead to recursive mutex lock.
+                //        This is why m_txQueue is a recursive mutex
                 dispatchTxRequest(m_txQueue.front());
                 if(not m_txQueue.front().m_dispatched)
                 {
@@ -292,7 +292,7 @@ void Bus<Strategy>::pjonEventLoop()
         // and stable strategy is to find out if a packet was sent or not.
 
         {
-            std::lock_guard<std::mutex> guard(m_txQueueMutex);
+            std::lock_guard<std::recursive_mutex> guard(m_txQueueMutex);
             if(m_txQueue.size()>0 and (m_txQueue.front().m_dispatched == true))
             {
                 if(m_pjon.packets[m_txQueue.front().m_pjonPacketBufferIndex].state == 0)
