@@ -178,7 +178,7 @@ void Bus<Strategy>::pjonErrorHandler(uint8_t code, uint16_t data, void *custom_p
     //       human readable error information paired with a machine readable
     //       success or failure information)
     {
-        std::lock_guard<std::mutex> guard(m_txQueueMutex);
+        std::lock_guard<std::recursive_mutex> guard(m_txQueueMutex);
         if(m_txQueue.size()>0 and (m_txQueue.front().m_dispatched == true))
         {
             if(m_txQueue.front().m_pjonPacketBufferIndex == data)
@@ -244,7 +244,7 @@ void Bus<Strategy>::pjonEventLoop()
     {
         // first do tx queue dispatch if required:
         {
-            std::lock_guard<std::mutex> guard(m_txQueueMutex);
+            std::lock_guard<std::recursive_mutex> guard(m_txQueueMutex);
             if((m_txQueue.size()>0) and (m_txQueue.front().m_dispatched == false))
             {
                 // have a new packet to transmit and all previous packets are sent
