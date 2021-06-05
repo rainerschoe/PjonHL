@@ -17,7 +17,7 @@
 #include <vector>
 #include "Expect.hpp"
 #include "Address.hpp"
-#include "Bus.hpp"
+#include "PjonHlBus.hpp"
 
 namespace PjonHL
 {

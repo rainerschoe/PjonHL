@@ -9,7 +9,7 @@
 // Include PJON, Strategies and PjonHL::Bus
 #include <PJON.h>
 #include "strategies/ThroughSerial/ThroughSerial.h"
-#include "Bus.hpp"
+#include "PjonHlBus.hpp"
 
 // Iostream for printing to stdout
 #include <iostream>

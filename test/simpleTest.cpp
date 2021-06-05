@@ -23,7 +23,7 @@
 #define PJON_INCLUDE_TS true  // Include only ThroughSerial
 #define PJON_INCLUDE_LUDP true
 #define TS_INITIAL_DELAY 0
-#include "../Bus.hpp"
+#include "../PjonHlBus.hpp"
 //#include "Actions.hpp"
 
 #include <PJON.h>

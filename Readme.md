@@ -12,7 +12,7 @@ The target platforms for PjonHL are systems which provide
 
 This document intends to give a simplified overview. For detailed documentation
 please have a look into the corresponding `.hpp` header files. A good start is
-[Bus.hpp](./Bus.hpp) and [Connection.hpp](./Connection.hpp).
+[PjonHlBus.hpp](./PjonHlBus.hpp) and [Connection.hpp](./Connection.hpp).
 
 ## Building and Linking
 PjonHL needs to be built and linked to your project.

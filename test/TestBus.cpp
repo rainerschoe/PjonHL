@@ -14,7 +14,7 @@
 
 #include "catch2/catch.hpp"
 
-#include "Bus.hpp"
+#include "PjonHlBus.hpp"
 #include "PJONDefines.h"
 #include <algorithm>
 #include <inttypes.h>

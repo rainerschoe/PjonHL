@@ -152,4 +152,4 @@ class Bus
 };
 }
 
-#include "Bus.inl"
+#include "PjonHlBus.inl"

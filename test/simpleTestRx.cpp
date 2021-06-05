@@ -22,7 +22,7 @@
 
 #define PJON_INCLUDE_TS true  // Include only ThroughSerial
 #define PJON_INCLUDE_LUDP true
-#include "../Bus.hpp"
+#include "../PjonHlBus.hpp"
 
 #include <PJON.h>
 #include "strategies/ThroughSerial/ThroughSerial.h"
