@@ -209,7 +209,7 @@ TEST_CASE( "destruct bus before connection", "" ) {
     auto future = (*connection)->send(std::vector<uint8_t>{0x00});
 
     REQUIRE(future.valid() == true);
-    REQUIRE(future.get() == false);
+    REQUIRE(future.get().isGood() == false);
     REQUIRE(shadow().sendCount == 0);
 }
 
@@ -220,7 +220,7 @@ TEST_CASE( "Send Succeed", "" ) {
     shadow().setNextSendResult(true);
     auto future = connection->send(std::vector<uint8_t>{0x00});
     REQUIRE(future.valid() == true);
-    REQUIRE(future.get() == true);
+    REQUIRE(future.get().isGood() == true);
     REQUIRE(1 == shadow().sendCount);
 }
 
@@ -231,7 +231,7 @@ TEST_CASE( "Send Fail", "" ) {
     shadow().setNextSendResult(false);
     auto future = connection->send(std::vector<uint8_t>{0x00});
     REQUIRE(future.valid() == true);
-    REQUIRE(future.get() == false);
+    REQUIRE(future.get().isGood() == false);
     REQUIRE(1 == shadow().sendCount);
 }
 

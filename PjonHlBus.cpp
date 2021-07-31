@@ -56,4 +56,19 @@ void globalReceiverFunction(
     getReceiverFunction()(payload, length, packet_info);
 }
 
+// -----------------------------------------------------------------------------
+std::string PjonErrorToString(uint8_t f_errorCode, uint8_t f_data)
+{
+    switch(f_errorCode)
+    {
+        case PJON_PACKETS_BUFFER_FULL:
+            return "PJON Packet buffer full. Max number of packets in buffer is " + std::to_string(f_data);
+        case PJON_CONTENT_TOO_LONG:
+            return "PJON Packet content too long. Max Packet size is " + std::to_string(PJON_PACKET_MAX_LENGTH) + " bytes, but given packet has " + std::to_string(f_data) + " bytes.";
+        case PJON_CONNECTION_LOST:
+            return "PJON Remote device did not ACK. Connection may be lost.";
+        default:
+            return "Unknown PJON Error code " + std::to_string(f_errorCode);
+    }
+}
 }

@@ -22,6 +22,49 @@
 namespace PjonHL
 {
 
+class Result
+{
+    public:
+        inline
+        Result() :
+            m_success{true}
+
+        {
+        }
+
+        explicit inline
+        Result(bool f_success) :
+            m_success{f_success}
+
+        {
+        }
+
+        explicit inline
+        Result(std::string f_errorMessage) :
+            m_success{false},
+            m_errorMessage{f_errorMessage}
+
+        {
+        }
+
+        inline bool isGood()
+        {
+            return m_success;
+        }
+        inline bool isBad()
+        {
+            return not m_success;
+        }
+        inline std::string getErrorMessage()
+        {
+            return m_errorMessage;
+        }
+    private:
+        bool m_success;
+        std::string m_errorMessage;
+};
+
+
 template<class Strategy>
 class Bus;
 
@@ -40,7 +83,7 @@ class Connection
         ///          successfully or not. A call to .get() will block until the
         ///          result is known for sure (I.e. packet could be sent or
         ///          failed to send).
-        std::future<bool> send(
+        std::future<Result> send(
                 const std::vector<uint8_t> && f_payload,
                 uint32_t f_timeout_milliseconds = 1000,
                 bool f_enableRetransmit=true

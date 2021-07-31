@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <inttypes.h>
 #include <mutex>
 #include <string>
@@ -30,15 +31,23 @@
 #include "Address.hpp"
 #include "Connection.hpp"
 #include "BusConfig.hpp"
+#include "PJONDefines.h"
+
 
 template<class Strategy>
 class PJON;
 
 namespace PjonHL
 {
+
+/// Converts error information (given in PJON Error callback) to a human
+/// readable form.
+/// @param f_errorCode first argument of error callback function containing error code.
+/// @param f_data second argument of error callback function giving context for the error.
+std::string PjonErrorToString(uint8_t f_errorCode, uint8_t f_data);
+
 template<class Strategy>
 class Connection;
-
 
 template<class Strategy>
 class Bus
@@ -104,7 +113,7 @@ class Bus
         /// operation.
         /// Prefer using connections for sending/receiving instead of this
         /// send() function.
-        std::future<bool> send(
+        std::future<Result> send(
                 Address f_localAddress,
                 Address f_remoteAddress,
                 const std::vector<uint8_t> & f_payload,
@@ -115,7 +124,7 @@ class Bus
     private:
         struct TxRequest
         {
-            std::promise<bool> m_successPromise;
+            std::promise<Result> m_successPromise;
             std::vector<uint8_t> m_payload;
             Address m_localAddress;
             Address m_remoteAddress;
@@ -149,6 +158,8 @@ class Bus
         std::thread m_eventLoopThread;
 
         std::atomic<bool> m_eventLoopRunning = true;
+
+        std::atomic<std::chrono::steady_clock::time_point> m_lastRxTxActivity{std::chrono::steady_clock::now()};
 };
 }
 

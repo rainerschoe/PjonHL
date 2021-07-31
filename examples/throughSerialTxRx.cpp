@@ -46,18 +46,19 @@ int main()
     // Send a packet (send will not block):
     std::cout << "Dispatching packet to " << targetAddr.toString() << "..." << std::endl;
     std::vector<uint8_t> identification_request{0xab, 0xcd, 0xef};
-    std::future<bool> success = connection->send(std::move(identification_request), 1000);
+    std::future<PjonHL::Result> resultFut = connection->send(std::move(identification_request), 1000);
     std::cout << " done" << std::endl;
 
     // Check if send succeeded (this will now wait until packet is sent or failed):
     std::cout << "Check if send was successful..." << std::endl;
-    if(success.get())
+    auto result = resultFut.get();
+    if(result.isGood())
     {
         std::cout << " success :)\n";
     }
     else
     {
-        std::cout << " failure :(\n";
+        std::cout << " failure :( " << result.getErrorMessage() << "\n";
     }
 
     // now receive data on this connection (wait up to 1s for data to arrive):

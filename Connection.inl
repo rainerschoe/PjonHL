@@ -26,14 +26,14 @@ Connection<Strategy>::Connection(Address f_remoteAddress, Address f_remoteMask, 
 }
 
 template<class Strategy>
-std::future<bool> Connection<Strategy>::send(const std::vector<uint8_t> && f_payload, uint32_t f_timeout_milliseconds, bool f_enableRetransmit)
+std::future<Result> Connection<Strategy>::send(const std::vector<uint8_t> && f_payload, uint32_t f_timeout_milliseconds, bool f_enableRetransmit)
 {
     std::lock_guard<std::mutex> guard(m_activityMutex);
 
     if(not m_active)
     {
-        std::promise<bool> promise;
-        promise.set_value(false);
+        std::promise<Result> promise;
+        promise.set_value(Result("Connection not active (is Bus instance still alive?)"));
         return promise.get_future();
     }
     // TODO: I hope m_localAddress means to PJON what I think it means?

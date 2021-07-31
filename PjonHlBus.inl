@@ -16,8 +16,6 @@
 #include <inttypes.h>
 #include <mutex>
 
-#include "PJONDefines.h"
-
 namespace PjonHL
 {
 
@@ -153,7 +151,7 @@ typename Bus<Strategy>::ConnectionHandle Bus<Strategy>::createConnection(Address
 }
 
 template<class Strategy>
-std::future<bool> Bus<Strategy>::send(Address f_localAddress, Address f_remoteAddress, const std::vector<uint8_t> & f_payload, uint32_t f_timeout_milliseconds, bool f_enableRetransmit)
+std::future<Result> Bus<Strategy>::send(Address f_localAddress, Address f_remoteAddress, const std::vector<uint8_t> & f_payload, uint32_t f_timeout_milliseconds, bool f_enableRetransmit)
 {
     TxRequest request;
     request.m_payload = f_payload;
@@ -183,7 +181,7 @@ void Bus<Strategy>::pjonErrorHandler(uint8_t code, uint16_t data, void *custom_p
         {
             if(m_txQueue.front().m_pjonPacketBufferIndex == data)
             {
-                m_txQueue.front().m_successPromise.set_value(false);
+                m_txQueue.front().m_successPromise.set_value(Result(PjonErrorToString(code, data)));
                 m_txQueue.pop();
             }
         }
@@ -235,6 +233,8 @@ void Bus<Strategy>::pjonReceiveFunction(
             connection->addReceivedPacket(std::vector<uint8_t>(payload, payload + length), remoteAddr);
         }
     }
+
+    m_lastRxTxActivity = std::chrono::steady_clock::now();
 }
 
 template<class Strategy>
@@ -257,7 +257,8 @@ void Bus<Strategy>::pjonEventLoop()
                 {
                     // dispatch failed (most likely packet size too big)
                     // -> communicate to user and drop packet:
-                    m_txQueue.front().m_successPromise.set_value(false);
+                    // TODO: more concrete error message?
+                    m_txQueue.front().m_successPromise.set_value(Result("Dispatching failed, Most likely packet size too big."));
                     m_txQueue.pop();
                 }
 
@@ -300,7 +301,7 @@ void Bus<Strategy>::pjonEventLoop()
                     // we now know we have success, as if we would have failure, 
                     // error callback would have been called and the packet would
                     // already be popped with promise set to false
-                    m_txQueue.front().m_successPromise.set_value(true);
+                    m_txQueue.front().m_successPromise.set_value(Result());
 
                     // packet can be popped from queue:
                     m_txQueue.pop();
@@ -309,7 +310,15 @@ void Bus<Strategy>::pjonEventLoop()
         }
 
         // handle second part of PJON state machine, receiving packets:
-        m_pjon.receive();
+        for(int i = 0; i<100; i++)
+        {
+            // calling this multiple times, as pjon internally might receive
+            // packets event-loop based byte-by byte.
+            // This would then effectively limit to one byte per sleep period.
+            // I circumvent this by hoping that a pjon packet rarely has
+            // more than 100 bytes required to receive
+            m_pjon.receive();
+        }
 
         // FIXME: this causes "busy-waiting" loop, and causes high CPU load.
         //        as a simple workaround we introduce a delay here to free up
@@ -326,9 +335,9 @@ void Bus<Strategy>::pjonEventLoop()
         //        Other solutions e.g. using poll() for unix serial device read
         //        may work more efficiently and provide very low latency, but are
         //        specific to used strategy :-(
-        if(m_txQueue.size() == 0)
+        if(std::chrono::steady_clock::now() - m_lastRxTxActivity.load() > std::chrono::milliseconds(200))
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
         }
     }
 }
@@ -356,6 +365,9 @@ void Bus<Strategy>::dispatchTxRequest(TxRequest & f_request)
             f_request.m_payload.data(),
             f_request.m_payload.size()
             );
+
+    m_lastRxTxActivity = std::chrono::steady_clock::now();
+
     if(bufferIndex != PJON_FAIL)
     {
         f_request.m_pjonPacketBufferIndex = bufferIndex;
