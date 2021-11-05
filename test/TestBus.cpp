@@ -91,6 +91,11 @@ class PJONShadow
 
     // test functionality:
     size_t sendCount = 0;
+    size_t getRxQueueSize()
+    {
+        std::lock_guard<std::mutex> guard(m_rxPacketQueueMutex);
+        return m_rxPacketQueue.size();
+    }
     void reset()
     {
         sendCount = 0;
@@ -254,6 +259,44 @@ TEST_CASE( "Send Fail", "" ) {
     REQUIRE(future.valid() == true);
     REQUIRE(future.get().isGood() == false);
     REQUIRE(1 == shadow().sendCount);
+}
+
+TEST_CASE( "Rx good case With Bus Pause", "" ) {
+    shadow().reset();
+    PjonHL::Bus<Strategy> bus(PjonHL::Address{36}, Strategy{});
+    auto connection = bus.createConnection(PjonHL::Address{42});
+
+    std::vector<uint8_t> payload{0xab, 0xcd, 0xef};
+    PJON_Packet_Info info;
+    info.rx.id = 36;
+    info.tx.id = 42;
+    shadow().enqueuePacketForRx(payload.data(), payload.size(), info);
+    REQUIRE(shadow().getRxQueueSize() == 1);
+
+    bus.pause();
+
+    auto receiveFuture = std::async(
+            std::launch::async,
+            [connection{std::move(connection)}]()
+            {
+                return connection->receive(100);
+            }
+            );
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    REQUIRE(shadow().getRxQueueSize() == 1);
+
+    bus.resume();
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    REQUIRE(shadow().getRxQueueSize() == 0);
+
+    auto expectedData = receiveFuture.get();
+
+    REQUIRE(expectedData.isValid() == true);
+    auto data = expectedData.unwrap();
+
+    REQUIRE(data[0] == 0xab);
+    REQUIRE(data[1] == 0xcd);
+    REQUIRE(data[2] == 0xef);
 }
 
 TEST_CASE( "Rx good case", "" ) {
