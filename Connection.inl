@@ -33,7 +33,7 @@ std::future<Result> Connection<Strategy>::send(const std::vector<uint8_t> && f_p
     if(not m_active)
     {
         std::promise<Result> promise;
-        promise.set_value(Result("Connection not active (is Bus instance still alive?)"));
+        promise.set_value(Result(std::string("Connection not active (is Bus instance still alive?)")));
         return promise.get_future();
     }
     // TODO: I hope m_localAddress means to PJON what I think it means?
