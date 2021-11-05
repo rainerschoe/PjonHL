@@ -28,14 +28,12 @@ class Result
         inline
         Result() :
             m_success{true}
-
         {
         }
 
         explicit inline
         Result(bool f_success) :
             m_success{f_success}
-
         {
         }
 
@@ -43,7 +41,6 @@ class Result
         Result(std::string f_errorMessage) :
             m_success{false},
             m_errorMessage{f_errorMessage}
-
         {
         }
 

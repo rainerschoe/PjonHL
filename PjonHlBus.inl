@@ -53,9 +53,12 @@ Bus<Strategy>::~Bus()
         connection->setInactive();
     }
 
-    m_eventLoopRunning = false;
+    if(m_eventLoopRunning)
+    {
+        m_eventLoopRunning = false;
+        m_eventLoopThread.join();
+    }
 
-    m_eventLoopThread.join();
     getErrorFunction() = std::function<void ( uint8_t code, uint16_t data, void *custom_pointer) >();
 }
 
@@ -117,6 +120,20 @@ Bus<Strategy>::Bus(Address f_localAddress, Strategy f_strategy, BusConfig f_conf
 }
 
 template<class Strategy>
+void Bus<Strategy>::pause()
+{
+    m_eventLoopRunning = false;
+    m_eventLoopThread.join();
+}
+
+template<class Strategy>
+void Bus<Strategy>::resume()
+{
+    m_eventLoopRunning = true;
+    m_eventLoopThread = std::thread([this]{pjonEventLoop();});
+}
+
+template<class Strategy>
 typename Bus<Strategy>::ConnectionHandle Bus<Strategy>::createDetachedConnection(Address f_remoteAddress, Address f_localAddress, Address f_remoteMask, Address f_localMask)
 {
     std::lock_guard<std::mutex> guard(m_connections_mutex);
@@ -170,11 +187,6 @@ std::future<Result> Bus<Strategy>::send(Address f_localAddress, Address f_remote
 template<class Strategy>
 void Bus<Strategy>::pjonErrorHandler(uint8_t code, uint16_t data, void *custom_pointer)
 {
-    // TODO: currently we discard `code` here and just propagate a boolean to
-    //       the future. Maybe later we should give more elaborate information
-    //       to the user through the future (maybe a result class with some
-    //       human readable error information paired with a machine readable
-    //       success or failure information)
     {
         std::lock_guard<std::recursive_mutex> guard(m_txQueueMutex);
         if(m_txQueue.size()>0 and (m_txQueue.front().m_dispatched == true))

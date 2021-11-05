@@ -224,6 +224,27 @@ TEST_CASE( "Send Succeed", "" ) {
     REQUIRE(1 == shadow().sendCount);
 }
 
+TEST_CASE( "Send With Bus Pause", "" ) {
+    shadow().reset();
+    PjonHL::Bus<Strategy> bus(PjonHL::Address{}, Strategy{});
+    auto connection = bus.createConnection(PjonHL::Address{});
+    shadow().setNextSendResult(true);
+
+    bus.pause();
+
+    auto future = connection->send(std::vector<uint8_t>{0x00});
+    REQUIRE(future.valid() == true);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    // bus is paused, shadow should not have seen any traffic:
+    REQUIRE(0 == shadow().sendCount);
+
+    bus.resume();
+
+    // now bus is resumed. send should succeed now.
+    REQUIRE(future.get().isGood() == true);
+    REQUIRE(1 == shadow().sendCount);
+}
+
 TEST_CASE( "Send Fail", "" ) {
     shadow().reset();
     PjonHL::Bus<Strategy> bus(PjonHL::Address{}, Strategy{});

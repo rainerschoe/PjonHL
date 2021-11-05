@@ -109,6 +109,16 @@ class Bus
                 Address f_localMask = Address::createAllOneAddress()
                 );
 
+        /// Stops processing PJON traffic on this Bus.
+        /// This can be used to prevent any trafic on the bus.
+        /// NOTE: This might cause packet loss.
+        /// E.g. - Sensitive devices, which need silence on the bus to prevent noise.
+        ///      - Bus shared with other protocols
+        void pause();
+
+        /// Resumes processing PJON traffic on this Bus.
+        void resume();
+
         /// Sends a packet without a connection. Should not be used in normal
         /// operation.
         /// Prefer using connections for sending/receiving instead of this
