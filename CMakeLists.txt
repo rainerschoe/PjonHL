@@ -47,6 +47,13 @@ target_include_directories(
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 target_link_libraries(${PROJECT_NAME} PUBLIC pthread libPjon)
 
+# TODO: build example in own CMake file (maybe use FetchContent)
+set(TARGET_NAME "throughSerialTxRx")
+add_executable(${TARGET_NAME}
+    examples/throughSerialTxRx.cpp
+    )
+target_link_libraries(${TARGET_NAME} PRIVATE PjonHL)
+
 # The following will build unit-tests and also pull in Catch2 as a dependency.
 if(CMAKE_TESTING_ENABLED)
     FetchContent_Declare(
@@ -76,15 +83,11 @@ if(CMAKE_TESTING_ENABLED)
       FetchContent_Populate(cmake-codecov)                 
       set(CMAKE_MODULE_PATH "${cmake-codecov_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
       find_package(codecov)                                
+      add_coverage(throughSerialTxRx)                         
+      add_coverage(${PROJECT_NAME})                         
       add_coverage(${TARGET_NAME})                         
       list(APPEND LCOV_REMOVE_PATTERNS "'/usr/*'")         
       coverage_evaluate()                                  
     endif()
 endif()
 
-# TODO: build example in own CMake file (maybe use FetchContent)
-set(TARGET_NAME "throughSerialTxRx")
-add_executable(${TARGET_NAME}
-    examples/throughSerialTxRx.cpp
-    )
-target_link_libraries(${TARGET_NAME} PRIVATE PjonHL)
