@@ -164,7 +164,11 @@ typename Bus<Strategy>::ConnectionHandle Bus<Strategy>::createDetachedConnection
 template<class Strategy>
 typename Bus<Strategy>::ConnectionHandle Bus<Strategy>::createConnection(Address f_remoteAddress, Address f_remoteMask)
 {
-    return createDetachedConnection(f_remoteAddress, m_localAddress, f_remoteMask, Address::createAllOneAddress());
+    // We want to match the remote port (not our local port)
+    auto localAddress = m_localAddress;
+    localAddress.port = f_remoteAddress.port;
+
+    return createDetachedConnection(f_remoteAddress, localAddress, f_remoteMask, Address::createAllOneAddress());
 }
 
 template<class Strategy>

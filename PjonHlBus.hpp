@@ -81,7 +81,7 @@ class Bus
         /// - Packets are received from this connection only, if both
         ///     1. The sender address matches the given f_remoteAddress masked by
         ///        f_remoteMask.
-        ///     2. The target address exactly matches the local address given in
+        ///     2. The target address (without port) exactly matches the local address given in
         ///        the constructor
         /// @param f_remoteAddress Address of the remote counterpart.
         /// @param f_remoteMask Incoming packets have to match f_remoteAddress
