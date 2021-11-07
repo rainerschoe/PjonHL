@@ -1,4 +1,6 @@
 # PjonHL
+[![codecov](https://codecov.io/gh/rainerschoe/PjonHL/branch/master/graph/badge.svg?token=40YFBTQ3BK)](https://codecov.io/gh/rainerschoe/PjonHL)
+
 PjonHL is a highlevel wrapper around [PJON](https://github.com/gioblu/PJON).
 
 It provides a thread-aware and thread-safe C++ (>=14) interface. 
