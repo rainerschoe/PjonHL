@@ -12,6 +12,7 @@ coverage:
   ignore:
     - "**/external/clara.hpp"
     - test
+    - examples
 
 
 codecov:
