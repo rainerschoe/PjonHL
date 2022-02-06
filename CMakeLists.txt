@@ -15,8 +15,12 @@ endif()
 if(NOT TARGET libPjon)
     FetchContent_Declare(
       Pjon
-      GIT_REPOSITORY https://github.com/gioblu/PJON
-      GIT_TAG        13.0
+      # TODO: using my private fork for now, which includes fix for
+      #       https://github.com/gioblu/PJON/issues/406
+      #       Once this is merged and release, can use official upstream again
+      GIT_REPOSITORY https://github.com/rainerschoe/PJON.git
+      #GIT_REPOSITORY https://github.com/gioblu/PJON
+      #GIT_TAG        13.0
     )
 
     FetchContent_GetProperties(Pjon)
