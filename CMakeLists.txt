@@ -20,7 +20,7 @@ if(NOT TARGET libPjon)
       #       Once this is merged and release, can use official upstream again
       GIT_REPOSITORY https://github.com/rainerschoe/PJON.git
       #GIT_REPOSITORY https://github.com/gioblu/PJON
-      #GIT_TAG        13.0
+      #GIT_TAG        f3611f40
     )
 
     FetchContent_GetProperties(Pjon)
