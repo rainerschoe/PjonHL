@@ -15,6 +15,7 @@
 #include <functional>
 #include <inttypes.h>
 #include <mutex>
+#include <string>
 
 namespace PjonHL
 {
@@ -63,8 +64,14 @@ Bus<Strategy>::~Bus()
 }
 
 template<class Strategy>
-Bus<Strategy>::Bus(Address f_localAddress, Strategy f_strategy, BusConfig f_config) :
-    m_pjon(f_localAddress.busId.data(), f_localAddress.id)
+Bus<Strategy>::Bus(
+        Address f_localAddress,
+        Strategy f_strategy,
+        BusConfig f_config,
+        std::unique_ptr<Logger> f_logger
+        ) :
+    m_pjon(f_localAddress.busId.data(), f_localAddress.id),
+    m_logger(std::move(f_logger))
 {
     m_localAddress = f_localAddress;
     m_pjon.strategy = f_strategy;
@@ -234,6 +241,12 @@ void Bus<Strategy>::pjonReceiveFunction(
     targetAddr.busId[1] = packet_info.rx.bus_id[1];
     targetAddr.busId[2] = packet_info.rx.bus_id[2];
     targetAddr.busId[3] = packet_info.rx.bus_id[3];
+
+#if(PJON_INCLUDE_PACKET_ID)
+    m_logger->log(Logger::Debug, "Rx packet: remote=" + remoteAddr.toString() + " target=" + targetAddr.toString() + " packet id = " +  std::to_string(packet_info.id));
+#else 
+    m_logger->log(Logger::Debug, "Rx packet: remote=" + remoteAddr.toString() + " target=" + targetAddr.toString() + " packet id = [DISABLED_IN_PJON_HL]");
+#endif
 
     std::lock_guard<std::mutex> connections_guard(m_connections_mutex);
     for(auto connection : m_connections)

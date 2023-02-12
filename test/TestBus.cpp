@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include "catch2/catch.hpp"
-
+#define PJON_INCLUDE_PACKET_ID 1
 #include "PjonHlBus.hpp"
 #include "PJONDefines.h"
 #include <algorithm>

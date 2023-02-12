@@ -16,6 +16,7 @@
 
 #include <chrono>
 #include <inttypes.h>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -31,6 +32,7 @@
 #include "Address.hpp"
 #include "Connection.hpp"
 #include "BusConfig.hpp"
+
 #include "PJONDefines.h"
 
 
@@ -48,6 +50,29 @@ std::string PjonErrorToString(uint8_t f_errorCode, uint8_t f_data);
 
 template<class Strategy>
 class Connection;
+
+class Logger
+{
+    public:
+        enum LogLevel
+        {
+            Debug,
+            Info,
+            Error
+        };
+
+        virtual void log(LogLevel f_level, std::string f_message) = 0;
+};
+
+class DefaultLogger : public Logger
+{
+    public:
+
+        virtual inline void log(LogLevel f_level, std::string f_message) override
+        {
+            std::cout << "PjonHl: " << f_message << std::endl;
+        }
+};
 
 template<class Strategy>
 class Bus
@@ -67,7 +92,8 @@ class Bus
         Bus(
                 Address f_localAddress,
                 Strategy f_strategy,
-                BusConfig f_config = BusConfig{}
+                BusConfig f_config = BusConfig{},
+                std::unique_ptr<Logger> = std::make_unique<DefaultLogger>()
            );
 
         /// Handle which will be returned by createConnection() calls.
@@ -131,6 +157,11 @@ class Bus
                 bool f_enableRetransmit = true
                 );
 
+        inline Logger & getLogger()
+        {
+            return *m_logger;
+        }
+
     private:
         struct TxRequest
         {
@@ -170,6 +201,8 @@ class Bus
         std::atomic<bool> m_eventLoopRunning = true;
 
         std::atomic<std::chrono::steady_clock::time_point> m_lastRxTxActivity{std::chrono::steady_clock::now()};
+
+        std::unique_ptr<Logger> m_logger;
 };
 }
 
