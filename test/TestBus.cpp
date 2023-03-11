@@ -365,6 +365,8 @@ TEST_CASE( "Rx good case 2 connections", "" ) {
     REQUIRE(data1.payload[0] == 0xab);
     REQUIRE(data1.payload[1] == 0xcd);
     REQUIRE(data1.payload[2] == 0xef);
+    REQUIRE(data1.remoteAddress.toString() == PjonHL::Address{42}.toString());
+    REQUIRE(data1.targetAddress.toString() == PjonHL::Address{36}.toString());
 
     auto expectedData2 = receiveFuture2.get();
 
