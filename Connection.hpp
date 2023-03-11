@@ -61,6 +61,21 @@ class Result
         std::string m_errorMessage;
 };
 
+struct ReceivedPacket 
+{
+    inline ReceivedPacket(std::vector<uint8_t> && f_payload, Address f_remoteAddress, Address f_targetAddress) :
+        remoteAddress(f_remoteAddress),
+        targetAddress(f_targetAddress),
+        payload(f_payload)
+    {}
+
+    ReceivedPacket() = default;
+
+    Address remoteAddress;
+    Address targetAddress;
+    std::vector<uint8_t> payload;
+};
+
 
 template<class Strategy>
 class Bus;
@@ -94,16 +109,16 @@ class Connection
         /// NOTE: Currently there is no way to determine the remote or local
         ///       address of a received packet (relevant if implementing routing)
         ///       This is a known limitation and will be addressed in the future.
-        Expect< std::vector<uint8_t> > receive(uint32_t f_timeout_milliseconds = 0);
+        Expect< ReceivedPacket > receive(uint32_t f_timeout_milliseconds = 0);
 
     private:
         Connection(Address f_remoteAddress, Address f_remoteMask, Address f_localAddress, Address f_localMask, Bus<Strategy> & f_pjonHL);
-        void addReceivedPacket(std::vector<uint8_t> && f_packet, Address f_remoteAddress);
+        void addReceivedPacket(std::vector<uint8_t> && f_packet, Address f_remoteAddress, Address f_targetAddress);
         void setInactive();
 
         std::mutex m_rxQueueMutex;
         std::condition_variable m_rxQueueCondition;
-        std::queue< std::vector<uint8_t> > m_rxQueue;
+        std::queue<ReceivedPacket> m_rxQueue;
 
         const Address m_remoteAddress;
         const Address m_remoteMask;

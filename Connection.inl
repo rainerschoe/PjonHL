@@ -41,12 +41,12 @@ std::future<Result> Connection<Strategy>::send(const std::vector<uint8_t> && f_p
 }
 
 template<class Strategy>
-Expect< std::vector<uint8_t> > Connection<Strategy>::receive(uint32_t f_timeout_milliseconds)
+Expect< ReceivedPacket > Connection<Strategy>::receive(uint32_t f_timeout_milliseconds)
 {
     std::unique_lock<std::mutex> guardActivity(m_activityMutex);
     if(not m_active)
     {
-        return Expect< std::vector<uint8_t> >();
+        return Expect< ReceivedPacket >();
     }
 
     std::unique_lock<std::mutex> guardRxQueue(m_rxQueueMutex);
@@ -59,16 +59,16 @@ Expect< std::vector<uint8_t> > Connection<Strategy>::receive(uint32_t f_timeout_
 
     if(dataAvailable)
     {
-        std::vector<uint8_t> rxPayload = std::move(m_rxQueue.front());
+        auto rxPacket = std::move(m_rxQueue.front());
         m_rxQueue.pop();
-        return Expect< std::vector<uint8_t> >{std::move(rxPayload)};
+        return Expect< ReceivedPacket >{std::move(rxPacket)};
     }
 
-    return Expect<std::vector<uint8_t>>{};
+    return Expect<ReceivedPacket>{};
 }
 
 template<class Strategy>
-void Connection<Strategy>::addReceivedPacket(std::vector<uint8_t> && f_packet, Address f_remoteAddress)
+void Connection<Strategy>::addReceivedPacket(std::vector<uint8_t> && f_payload, Address f_remoteAddress, Address f_targetAddress)
 {
     // NOTE: not locking m_activityMutex here
     //       - to avoid problems with condition variable.
@@ -82,7 +82,7 @@ void Connection<Strategy>::addReceivedPacket(std::vector<uint8_t> && f_packet, A
 
     // TODO: handle remote address here
     std::unique_lock<std::mutex> guardRxQueue(m_rxQueueMutex);
-    m_rxQueue.push(f_packet);
+    m_rxQueue.push(ReceivedPacket(std::move(f_payload), f_remoteAddress, f_targetAddress));
     m_rxQueueCondition.notify_all();
 }
 

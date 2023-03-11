@@ -48,10 +48,12 @@ void globalReceiverFunction(
 template<class Strategy>
 Bus<Strategy>::~Bus()
 {
+    {
     std::lock_guard<std::mutex> guard(m_connections_mutex);
     for(Connection<Strategy>* connection: m_connections)
     {
         connection->setInactive();
+    }
     }
 
     if(m_eventLoopRunning)
@@ -259,7 +261,7 @@ void Bus<Strategy>::pjonReceiveFunction(
             connection->m_localAddress.matches(targetAddr, connection->m_localMask)
           )
         {
-            connection->addReceivedPacket(std::vector<uint8_t>(payload, payload + length), remoteAddr);
+            connection->addReceivedPacket(std::vector<uint8_t>(payload, payload + length), remoteAddr, targetAddr);
         }
     }
 

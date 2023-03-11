@@ -63,10 +63,10 @@ int main()
 
     // now receive data on this connection (wait up to 1s for data to arrive):
     std::cout << "Receive data from " << targetAddr.toString() << "..." << std::endl;
-    Expect< std::vector<uint8_t> > received = connection->receive(1000);
+    auto received = connection->receive(1000);
     if(received.isValid())
     {
-        std::vector<uint8_t> & data = received.unwrap();
+        std::vector<uint8_t> & data = received.unwrap().payload;
         std::cout << " Received " << data.size() << "bytes:" << std::endl;
         for(uint8_t byte : data)
         {

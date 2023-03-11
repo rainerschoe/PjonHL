@@ -294,9 +294,9 @@ TEST_CASE( "Rx good case With Bus Pause", "" ) {
     REQUIRE(expectedData.isValid() == true);
     auto data = expectedData.unwrap();
 
-    REQUIRE(data[0] == 0xab);
-    REQUIRE(data[1] == 0xcd);
-    REQUIRE(data[2] == 0xef);
+    REQUIRE(data.payload[0] == 0xab);
+    REQUIRE(data.payload[1] == 0xcd);
+    REQUIRE(data.payload[2] == 0xef);
 }
 
 TEST_CASE( "Rx good case", "" ) {
@@ -324,9 +324,9 @@ TEST_CASE( "Rx good case", "" ) {
     REQUIRE(expectedData.isValid() == true);
     auto data = expectedData.unwrap();
 
-    REQUIRE(data[0] == 0xab);
-    REQUIRE(data[1] == 0xcd);
-    REQUIRE(data[2] == 0xef);
+    REQUIRE(data.payload[0] == 0xab);
+    REQUIRE(data.payload[1] == 0xcd);
+    REQUIRE(data.payload[2] == 0xef);
 }
 
 TEST_CASE( "Rx good case 2 connections", "" ) {
@@ -362,18 +362,18 @@ TEST_CASE( "Rx good case 2 connections", "" ) {
     REQUIRE(expectedData1.isValid() == true);
     auto data1 = expectedData1.unwrap();
 
-    REQUIRE(data1[0] == 0xab);
-    REQUIRE(data1[1] == 0xcd);
-    REQUIRE(data1[2] == 0xef);
+    REQUIRE(data1.payload[0] == 0xab);
+    REQUIRE(data1.payload[1] == 0xcd);
+    REQUIRE(data1.payload[2] == 0xef);
 
     auto expectedData2 = receiveFuture2.get();
 
     REQUIRE(expectedData2.isValid() == true);
     auto data2 = expectedData2.unwrap();
 
-    REQUIRE(data2[0] == 0xab);
-    REQUIRE(data2[1] == 0xcd);
-    REQUIRE(data2[2] == 0xef);
+    REQUIRE(data2.payload[0] == 0xab);
+    REQUIRE(data2.payload[1] == 0xcd);
+    REQUIRE(data2.payload[2] == 0xef);
 }
 
 TEST_CASE( "Rx wrong target addr", "" ) {
@@ -501,9 +501,9 @@ TEST_CASE( "Rx listening on all remote addr", "" ) {
     REQUIRE(expectedData.isValid() == true);
     auto data = expectedData.unwrap();
 
-    REQUIRE(data[0] == 0xab);
-    REQUIRE(data[1] == 0xcd);
-    REQUIRE(data[2] == 0xef);
+    REQUIRE(data.payload[0] == 0xab);
+    REQUIRE(data.payload[1] == 0xcd);
+    REQUIRE(data.payload[2] == 0xef);
 }
 
 TEST_CASE( "Rx listening on different local addr", "" ) {
@@ -531,9 +531,9 @@ TEST_CASE( "Rx listening on different local addr", "" ) {
     REQUIRE(expectedData.isValid() == true);
     auto data = expectedData.unwrap();
 
-    REQUIRE(data[0] == 0xab);
-    REQUIRE(data[1] == 0xcd);
-    REQUIRE(data[2] == 0xef);
+    REQUIRE(data.payload[0] == 0xab);
+    REQUIRE(data.payload[1] == 0xcd);
+    REQUIRE(data.payload[2] == 0xef);
 }
 
 TEST_CASE( "Rx listening on different local addr but wrong received", "" ) {
@@ -591,8 +591,8 @@ TEST_CASE( "Rx listening on all local addr", "" ) {
     REQUIRE(expectedData.isValid() == true);
     auto data = expectedData.unwrap();
 
-    REQUIRE(data[0] == 0xab);
-    REQUIRE(data[1] == 0xcd);
-    REQUIRE(data[2] == 0xef);
+    REQUIRE(data.payload[0] == 0xab);
+    REQUIRE(data.payload[1] == 0xcd);
+    REQUIRE(data.payload[2] == 0xef);
 }
 
